@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System;
 
-public class DumbAI : AIPlayer{
+public class AIDumb : AIPlayer{
 
     Random random = new Random();
 

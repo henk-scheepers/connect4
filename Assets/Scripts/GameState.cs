@@ -11,6 +11,19 @@ public class GameState
         get{ return board; }
     }
 
+    public bool IsBoardFull{
+        get{
+            //if there are no empty cells in the top row, the board is full
+            int y = board.GetLength(1)-1;
+            for(int x = 0; x < board.GetLength(0); x++){
+                if(board[x, y] == 0){
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
     public GameState(int width, int height){
         board = new int[width, height];
         Reset();

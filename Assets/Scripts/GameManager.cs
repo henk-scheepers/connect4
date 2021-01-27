@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] int width = 7;
     [SerializeField] int height = 7;
     [SerializeField] GameBoard gameBoard;
+    [SerializeField] OpponentType opponentType;
 
     GameState gameState;
     int playerTurn = 1;
@@ -16,7 +17,9 @@ public class GameManager : MonoBehaviour
     const int PLAYER2 = 2;
 
     Evaluator evaluator = new Evaluator();
-    AIPlayer aiPlayer = new DumbAI();
+    AIPlayer aiPlayer;
+
+    bool gameEnded = false;
     
     // Start is called before the first frame update
     void Awake()
@@ -26,8 +29,19 @@ public class GameManager : MonoBehaviour
         gameState = new GameState(width, height);
         gameBoard.GenerateBoard(width, height);
 
-        if(humanPlayerNumber != playerTurn){    
-            StartCoroutine(AITurn());
+        if(opponentType != OpponentType.HUMAN){
+            InitializeAIPlayer();
+
+            if(humanPlayerNumber != playerTurn){    
+                StartCoroutine(AITurn());
+            }
+        }
+    }
+
+    void InitializeAIPlayer(){
+        switch(opponentType){
+            case OpponentType.DUMB_AI: aiPlayer = new AIDumb(); break;
+            case OpponentType.MINIMAX_AI : aiPlayer = new AIMinimax(); break;
         }
     }
 
@@ -40,7 +54,7 @@ public class GameManager : MonoBehaviour
     }
 
     void OnTileClicked(Vector2Int position){
-        if(playerTurn != humanPlayerNumber){
+        if(playerTurn != humanPlayerNumber && opponentType != OpponentType.HUMAN){
             return;
         }
 
@@ -48,13 +62,17 @@ public class GameManager : MonoBehaviour
         if(gameState.PlacePlayerDotInColumn(position.x, playerTurn)){
             gameBoard.UpdateBoard(gameState);
             SwitchPlayers();
-            Debug.Log(evaluator.Evaluate(gameState));
         }
 
-        StartCoroutine(AITurn());
+        if(opponentType != OpponentType.HUMAN){
+            StartCoroutine(AITurn());
+        }
     }
 
     void SwitchPlayers(){
+        int score;
+        gameEnded = evaluator.Evaluate(gameState, out score);
+        Debug.Log(score);
         playerTurn = playerTurn == 1 ? PLAYER2 : PLAYER1;
     }
 
@@ -64,4 +82,10 @@ public class GameManager : MonoBehaviour
         gameBoard.UpdateBoard(gameState);
         SwitchPlayers();
     }
+}
+
+public enum OpponentType{
+    DUMB_AI,
+    MINIMAX_AI,
+    HUMAN
 }

@@ -6,14 +6,25 @@ public class Evaluator
 {
     public const int WIN_SCORE = 10000;
 
-    public int Evaluate(GameState state){
-        int score = 0;
-        score += EvaluateColumns(state);
-        score += EvaluateRows(state);
-        score += EvaluateDiagonalDown(state);
-        score += EvaluateDiagonalUp(state);
+    public bool Evaluate(GameState state, out int score){
+        score = 0;
 
-        return score;
+        int[] scores = new int[4];
+
+        scores[0] += EvaluateColumns(state);
+        scores[1] += EvaluateRows(state);
+        scores[2] += EvaluateDiagonalDown(state);
+        scores[3] += EvaluateDiagonalUp(state);
+
+        for(int i = 0; i < scores.Length; i++){
+            if(Mathf.Abs(scores[i]) == WIN_SCORE){
+                score = scores[i];
+                return true;
+            }
+            score += scores[i];
+        }
+
+        return false;
     }
 
     //evaluate the columns of the board
@@ -26,7 +37,12 @@ public class Evaluator
             for(int y = 0; y < state.Board.GetLength(1); y++){
                 sequence[y] = state.Board[x, y];
             }
-            score += EvaluateSequence(sequence);
+
+            int sequenceScore = EvaluateSequence(sequence);
+            if(Mathf.Abs(sequenceScore) == WIN_SCORE){
+                return sequenceScore;
+            }
+            score += sequenceScore;
         }
         return score;
     }
@@ -41,7 +57,12 @@ public class Evaluator
             for(int x = 0; x < state.Board.GetLength(0); x++){
                 sequence[x] = state.Board[x, y];
             }
-            score += EvaluateSequence(sequence);
+
+            int sequenceScore = EvaluateSequence(sequence);
+            if(Mathf.Abs(sequenceScore) == WIN_SCORE){
+                return sequenceScore;
+            }
+            score += sequenceScore;
         }
         return score;
     }
@@ -77,11 +98,15 @@ public class Evaluator
                 y++;
             }
 
-            score += EvaluateSequence(sequence);
+            int sequenceScore = EvaluateSequence(sequence);
+            if(Mathf.Abs(sequenceScore) == WIN_SCORE){
+                return sequenceScore;
+            }
+            score += sequenceScore;
         }
 
         return score;
-    }
+    }   
 
     //evaluate the board diagonally from top to bottom
     int EvaluateDiagonalDown(GameState state){
@@ -114,7 +139,11 @@ public class Evaluator
                 y--;
             }
 
-            score += EvaluateSequence(sequence);
+            int sequenceScore = EvaluateSequence(sequence);
+            if(Mathf.Abs(sequenceScore) == WIN_SCORE){
+                return sequenceScore;
+            }
+            score += sequenceScore;
         }
 
         return score;
@@ -128,7 +157,13 @@ public class Evaluator
             for(int j = 0; j < 4; j++){
                 quartet[j] = sequence[i + j];
             }
-            score += EvaluateQuartet(quartet);
+
+            int quartetScore = EvaluateQuartet(quartet);
+            if(Mathf.Abs(quartetScore) == WIN_SCORE){
+                return quartetScore;
+            }
+
+            score += quartetScore;
         }
         return score;
     }
@@ -151,10 +186,10 @@ public class Evaluator
             return 0;
         //only 1 in quartet 
         }else if(p1Count > 0){
-            return p1Count == 4 ? WIN_SCORE : p1Count;
+            return p1Count == 4 ? WIN_SCORE : p1Count * p1Count;
         //only 2 in quartet
         }else if(p2Count > 0){
-            return p2Count == 4 ? -WIN_SCORE : -p2Count;
+            return p2Count == 4 ? -WIN_SCORE : -(p2Count * p2Count);
         }
         //quartet is empty
         return 0;
