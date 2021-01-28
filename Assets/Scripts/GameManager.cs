@@ -78,7 +78,10 @@ public class GameManager : MonoBehaviour
 
     IEnumerator AITurn(float delay = 1f){
         yield return new WaitForSeconds(delay);
-        gameState = aiPlayer.GetMove(gameState, playerTurn);
+        int move = aiPlayer.GetMove(gameState, playerTurn);
+        if(move != -1){
+            gameState.PlacePlayerDotInColumn(move, playerTurn);
+        }
         gameBoard.UpdateBoard(gameState);
         SwitchPlayers();
     }

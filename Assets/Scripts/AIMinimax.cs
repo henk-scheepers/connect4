@@ -8,11 +8,11 @@ public class AIMinimax : AIPlayer {
 
     Evaluator evaluator = new Evaluator();
 
-    public override GameState GetMove(GameState gameState, int player){
-        return Minimax(gameState, MaxDepth, player);
+    public override int GetMove(GameState gameState, int player){
+        return Minimax(gameState, MaxDepth, player, int.MinValue, int.MaxValue);
     }
 
-    GameState Minimax(GameState gameState, int depth, int player){
+    int Minimax(GameState gameState, int depth, int player, int alpha, int beta){
 
         bool isBoardFull = gameState.IsBoardFull;
 
@@ -21,17 +21,20 @@ public class AIMinimax : AIPlayer {
 
         //the game is done
         if (isBoardFull || hasWinner || depth == 0) {
-            return gameState;
+            return gameState.LastMove;
         }
 
         int bestEvaluation = player == 1 ? int.MinValue : int.MaxValue;
-        GameState bestGameState = null;
+        int bestMove = -1;
 
-        List<GameState> possibleStates = gameState.GetAllPossibleNextStates(player);
+        List<GameState> nextGameStates = gameState.GetAllPossibleNextStates(player);
 
-        foreach (GameState currentState in possibleStates) {
+        foreach (GameState currentState in nextGameStates) { 
 
-            GameState newGameState = Minimax(currentState, depth-1, player == 1 ? 2 : 1);
+            int newMove = Minimax(currentState, depth-1, player == 1 ? 2 : 1, alpha, beta);
+
+            GameState newGameState = gameState.Duplicate();
+            newGameState.PlacePlayerDotInColumn(newMove, player);   
 
             int newEvaluation;
             evaluator.Evaluate(newGameState, out newEvaluation);
@@ -39,16 +42,28 @@ public class AIMinimax : AIPlayer {
             if (player == 1) {
                 if(newEvaluation > bestEvaluation) {
                     bestEvaluation = newEvaluation;
-                    bestGameState = currentState;
+                    bestMove = newMove;
+                }
+
+                //alpha beta pruning for maximizing player
+                alpha = Mathf.Max(alpha, bestEvaluation);
+                if(alpha >= beta){
+                    break;
                 }
             }
             else {
                 if (newEvaluation < bestEvaluation) {
                     bestEvaluation = newEvaluation;
-                    bestGameState = currentState;
+                    bestMove = newMove;
+                }
+
+                //alpha beta pruning for minimizing player
+                beta = Mathf.Min(beta, bestEvaluation);
+                if(beta <= alpha){
+                    break;
                 }
             }
         }
-        return bestGameState;
+        return bestMove;
     }
 }

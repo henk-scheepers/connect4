@@ -213,7 +213,7 @@ MonoBehaviour:
   width: 7
   height: 7
   gameBoard: {fileID: 8747369}
-  opponentType: 2
+  opponentType: 1
 --- !u!1 &642436317
 GameObject:
   m_ObjectHideFlags: 0

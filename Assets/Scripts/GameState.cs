@@ -3,12 +3,18 @@ using System.Collections.Generic;
 public class GameState
 {
     int[,] board;
-    int player;
-    int visits;
-    float score;
+    int lastPlayerToMove;
+    int lastMove;
 
     public int[,] Board{
-        get{ return board; }
+        get => board;
+    }
+
+    public int LastMove{
+        get => lastMove;
+    }
+    public int LastPlayerToMove{
+        get => lastPlayerToMove;
     }
 
     public bool IsBoardFull{
@@ -58,6 +64,17 @@ public class GameState
         return possibleStates;
     }
 
+    public List<int> GetPossibleMoves(){
+        List<int> possibleMoves = new List<int>();
+        int y = board.GetLength(1)-1;
+        for(int x = 0; x < board.GetLength(0); x++){
+            if(board[x, y] == 0){
+                possibleMoves.Add(x);
+            }
+        }
+        return possibleMoves;
+    }
+
     //returns a bool specifying whether the attempted move was valid
     public bool PlacePlayerDotInColumn(int column, int player){
         if(player < 1 || player > 2){
@@ -71,6 +88,9 @@ public class GameState
         for(int y = 0; y < board.GetLength(1); y++){
             if(board[column, y] == 0){
                 board[column, y] = player;
+                lastMove = column;
+                lastPlayerToMove = player;
+                
                 return true;
             }
         }
