@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 
 namespace NN{
+    [System.Serializable]
     public class Neuron{
 		public List<Synapse> InputSynapses { get; set; }
 		public List<Synapse> OutputSynapses { get; set; }

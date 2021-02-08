@@ -3,13 +3,17 @@ using System.Linq;
 using System;
 
 namespace NN{
+    [System.Serializable]
     public class NeuralNetwork{
-        List<Neuron> inputLayer = new List<Neuron>();
-        List<List<Neuron>> hiddenLayers = new List<List<Neuron>>();
-        List<Neuron> outputLayer = new List<Neuron>();
+        public List<Neuron> inputLayer = new List<Neuron>();
+        public List<List<Neuron>> hiddenLayers = new List<List<Neuron>>();
+        public List<Neuron> outputLayer = new List<Neuron>();
 
         double learnRate;
         double momentum;
+
+        public NeuralNetwork(){
+        }
 
         public NeuralNetwork(int inputs, int[] hidden, int output, double learnRate, double momentum){
             this.learnRate = learnRate;
@@ -153,6 +157,42 @@ namespace NN{
                     output.InputSynapses.Add(synapse);
                 }
             }  
+        }
+
+        public override string ToString(){
+            string s = "";
+            s += "-- Input Layer ----------\n";
+            foreach(Neuron inputNeuron in inputLayer){
+                s += inputNeuron.Value + " ----> ";
+                foreach(Synapse inputNeuronSynapse in inputNeuron.OutputSynapses){
+                    s += inputNeuronSynapse.Weight + " | ";
+                }
+            }
+            s += "\n";
+
+            int hiddenLayerCount = 1;
+            foreach(List<Neuron> hiddenLayer in hiddenLayers){
+                s += "-- Hidden Layer " + hiddenLayerCount + " ----------\n";
+                foreach(Neuron hiddenNeuron in hiddenLayer){
+                    s += hiddenNeuron.Value + " ----> ";
+                    foreach(Synapse hiddenNeuronSynapse in hiddenNeuron.OutputSynapses){
+                        s += hiddenNeuronSynapse.Weight + " | ";
+                    }
+                    s += "\n";
+                }
+                hiddenLayerCount++;
+            }
+            s += "\n";
+
+            // s += "-- Output Layer ----------\n";
+            // foreach(Neuron outputNeuron in outputLayer){
+            //     s += outputNeuron.Value + ": ";
+            //     foreach(Synapse outputNeuronSynapse in outputNeuron.InputSynapses){
+            //         s += outputNeuronSynapse.Weight + " | ";
+            //     }
+            // }
+
+            return s;
         }
     }
 }

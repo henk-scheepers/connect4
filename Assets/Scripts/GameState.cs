@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NN;
 
 public class GameState
 {
@@ -96,5 +97,26 @@ public class GameState
         }
 
         return false;
+    }
+
+    public DataSet PrepareDataSet(int inputLayerSize, int outputLayerSize, int correctMove = -1){
+        double[] values = new double[inputLayerSize];
+        double[] targets = new double[outputLayerSize];
+
+        int width = Board.GetLength(0);
+        int height = Board.GetLength(1);
+
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                values[y * width + x] = Board[x, y]; 
+            }
+        }
+
+        values[values.Length-1] = LastPlayerToMove;
+        
+        if(correctMove >= 0)
+            targets[correctMove] = 1;
+
+        return new DataSet(values, targets);
     }
 }

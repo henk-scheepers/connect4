@@ -6,6 +6,8 @@ public class Evaluator
 {
     public const int WIN_SCORE = 10000;
 
+    //public int Evaluate(GameState state, out)
+
     public bool Evaluate(GameState state, out int score){
         score = 0;
 

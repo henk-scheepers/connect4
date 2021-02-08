@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NN;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] int height = 7;
     [SerializeField] GameBoard gameBoard;
     [SerializeField] OpponentType opponentType;
+
+    [SerializeField] int minimaxDepth = 6;
+    [SerializeField] string neuralNetworkFileName;
 
     GameState gameState;
     int playerTurn = 1;
@@ -40,8 +44,20 @@ public class GameManager : MonoBehaviour
 
     void InitializeAIPlayer(){
         switch(opponentType){
-            case OpponentType.DUMB_AI: aiPlayer = new AIDumb(); break;
-            case OpponentType.MINIMAX_AI : aiPlayer = new AIMinimax(); break;
+            case OpponentType.DUMB_AI: {
+                aiPlayer = new AIDumb(); break;
+            }
+            case OpponentType.MINIMAX_AI : {
+                AIMinimax minimax = new AIMinimax(); 
+                minimax.MaxDepth = minimaxDepth;
+                aiPlayer = minimax; 
+                break;
+            }
+            case OpponentType.NEURAL_NETWORK_AI : {
+                NeuralNetwork nn = Utils.ReadFromBinaryFile<NeuralNetwork>(Application.streamingAssetsPath + "/" + neuralNetworkFileName);
+                aiPlayer = new AINeuralNetwork(nn);
+                break;
+            }
         }
     }
 
@@ -90,5 +106,6 @@ public class GameManager : MonoBehaviour
 public enum OpponentType{
     DUMB_AI,
     MINIMAX_AI,
+    NEURAL_NETWORK_AI,
     HUMAN
 }

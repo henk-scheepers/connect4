@@ -1,4 +1,5 @@
 namespace NN{
+    [System.Serializable]
     public class Synapse{
         public Neuron InputNeuron { get; set; }
 		public Neuron OutputNeuron { get; set; }
